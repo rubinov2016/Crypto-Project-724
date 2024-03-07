@@ -63,14 +63,6 @@ print(crypto_data.columns)
 crypto_data.index = pd.to_datetime(crypto_data.index)
 crypto_data.index = crypto_data.index.date
 crypto_data.index.name = 'Date'
-# Assuming df is your DataFrame and 'column_name' is the name of the column you're checking for
-column_name = 'Date'  # Replace 'Date' with the actual column name you're checking
-# Check if the column exists in the DataFrame
-if column_name in crypto_data.columns:
-    print(f"Column '{column_name}' exists in the DataFrame.")
-else:
-    print(f"Column '{column_name}' does not exist in the DataFrame.")
-
 # crypto_data['Date'] = pd.to_datetime(crypto_data['Date']).dt.date
 
 column_to_drop = 'Dividends'
