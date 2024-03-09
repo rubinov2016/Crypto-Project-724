@@ -101,16 +101,8 @@ def display_page(pathname):
             [0.0, 'rgb(178,24,43)'],
 
             # Transition to lighter red for less negative correlations
-            [0.25, 'rgb(239,138,98)'],
+            [1.0, 'rgb(239,138,98)']
 
-            # Use white for zero correlation
-            [0.5, 'rgb(255,255,255)'],
-
-            # Transition to lighter green for positive correlations
-            [0.75, 'rgb(103,169,207)'],
-
-            # Assign deep green to the most positive correlations
-            [1.0, 'rgb(26,150,65)']
         ]
         fig_positive = ff.create_annotated_heatmap(
             z=z_positive,
@@ -141,8 +133,14 @@ def display_page(pathname):
         # Return a Div containing the heatmap Graph for the EDA page
         return html.Div([
             html.H1("EDA Page Content"),
-            dcc.Graph(id='positive-correlations', figure=fig_positive),
-            dcc.Graph(id='negative-correlations', figure=fig_negative)
+            # dcc.Graph(id='positive-correlations', figure=fig_positive),
+            # dcc.Graph(id='negative-correlations', figure=fig_negative)
+            # Create a container div with display flex to align items horizontally
+            html.Div([
+                # Place each graph in a div, setting the flex attribute for even spacing
+                html.Div([dcc.Graph(figure=fig_positive)], style={'flex': '1'}),
+                html.Div([dcc.Graph(figure=fig_negative)], style={'flex': '1'})
+            ], style={'display': 'flex', 'flex-wrap': 'wrap'})
 
         ])
         return html.H1("EDA Page Content")
