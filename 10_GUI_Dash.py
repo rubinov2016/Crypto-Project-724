@@ -9,6 +9,7 @@ import plotly.express as px
 from correlation import get_top_correlated_stocks
 import plotly.figure_factory as ff
 import plotly.graph_objs as go
+from scipy.stats import skew, kurtosis
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -35,6 +36,8 @@ app = dash.Dash(__name__)
 # Function to create a histogram and a box plot for a given stock
 # Function to create a histogram and a box plot for a given stock
 def create_stock_distribution(stock_name, stock_data):
+
+    print(stock_name, type(stock_data))
     # Create histogram
     histogram = go.Figure(data=[go.Histogram(x=stock_data, nbinsx=30, name=f'Histogram of {stock_name}')])
     histogram.update_layout(title_text=f'Histogram of {stock_name}', bargap=0.05)
@@ -43,6 +46,13 @@ def create_stock_distribution(stock_name, stock_data):
     box_plot = go.Figure(data=[go.Box(y=stock_data, name=f'Box Plot of {stock_name}')])
     box_plot.update_layout(title_text=f'Box Plot of {stock_name}')
 
+    mean_value = stock_data.mean()
+    median_value = stock_data.median()
+    mode_value = stock_data.mode().values[0]  # Mode can have multiple values; take the first one
+    skewness = skew(stock_data)
+    kurt = kurtosis(stock_data)
+
+    # return histogram, box_plot, mean_value, median_value, mode_value, skewness, kurt
     return histogram, box_plot
 
 
@@ -161,11 +171,20 @@ def display_page(pathname):
         ])
         # return html.H1("EDA Page Content")
     elif pathname == "/distribution":
-        html.H2("Distribution Analysis of  Stocks"),
+        html.H2("Distribution Analysis of Stocks"),
         histogram_fig1, box_plot_fig1 = create_stock_distribution('BTC-USD', df_stocks['BTC-USD'])
         histogram_fig2, box_plot_fig2 = create_stock_distribution('ETH-USD', df_stocks['ETH-USD'])
         histogram_fig3, box_plot_fig3 = create_stock_distribution('USDT-USD', df_stocks['USDT-USD'])
         histogram_fig4, box_plot_fig4 = create_stock_distribution('MKR-USD', df_stocks['MKR-USD'])
+        # histogram_fig1, box_plot_fig1, mean_value, median_value, mode_value, skewness, kurt = create_stock_distribution(
+        #     'BTC-USD', df_stocks['BTC-USD'])
+        # histogram_fig2, box_plot_fig2, mean_value, median_value, mode_value, skewness, kurt = create_stock_distribution(
+        #     'ETH-USD', df_stocks['ETH-USD'])
+        # histogram_fig3, box_plot_fig3, mean_value, median_value, mode_value, skewness, kurt = create_stock_distribution(
+        #     'USDT-USD', df_stocks['USDT-USD'])
+        # histogram_fig4, box_plot_fig4, mean_value, median_value, mode_value, skewness, kurt = create_stock_distribution(
+        #     'MKR-USD', df_stocks['MKR-USD'])
+
         return html.Div([
             html.H1("Stock Distribution Analysis"),
             # Div for each chart, set to inline-block to place them on the same line
