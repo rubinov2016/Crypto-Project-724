@@ -6,7 +6,7 @@ from tensorflow.keras.datasets import mnist
 from sklearn.preprocessing import MinMaxScaler
 
 df = pd.read_csv('crypto_data_clean.csv')
-tickers = ['AAVE-USD', 'ADA-USD', 'BTC-USD', 'ETH-USD']
+tickers = ['MKR-USD','ETH-USD','BTC-USD','USDT-USD']
 # Filter the DataFrame
 df_filtered = df[df['Symbol'].isin(tickers)]
 # Pivot the DataFrame

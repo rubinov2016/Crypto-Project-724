@@ -1,0 +1,19 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.content {
+    margin-left: 260px;
+    padding: 20px;
+}
+
+.nav-link {
+    display: block;
+    margin: 5px 0;
+}
