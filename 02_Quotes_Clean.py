@@ -4,9 +4,9 @@ df = pd.read_csv('crypto_data.csv')
 
 # Pivot the DataFrame
 df = df.pivot(index='Symbol', columns='Date', values='Close')
-# df = df.drop(df.index[0])
 df = df.dropna()
 df.to_csv('crypto_data_clean.csv', header=True)
+
 #
 # new_column_names = df.iloc[0]
 # print(new_column_names)

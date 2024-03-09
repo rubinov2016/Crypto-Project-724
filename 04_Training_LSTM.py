@@ -4,6 +4,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from tensorflow.keras.optimizers import Adam
 from sklearn.preprocessing import MinMaxScaler
+from joblib import dump, load
 
 df = pd.read_csv('crypto_data_clean.csv')
 # print(df)
@@ -19,10 +20,11 @@ df_pivoted = df_filtered
 print(1)
 # df_pivoted = df_pivoted.pivot(index='Date', columns='Symbol', values='Price')
 print(2)
+df_pivoted.to_csv('crypto_data_AAVE-USD.csv', header=True)
 # Normalize your data
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled_data = scaler.fit_transform(df_filtered)
-
+dump(scaler, 'scaler.joblib')
 # Function to create sequences for LSTM
 def create_sequences(data, sequence_length=30):
     xs, ys = [], []
