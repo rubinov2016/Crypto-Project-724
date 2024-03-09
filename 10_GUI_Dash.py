@@ -8,11 +8,16 @@ import pandas as pd
 import plotly.express as px
 from correlation import get_top_correlated_stocks
 import plotly.figure_factory as ff
+import plotly.graph_objs as go
 
 import seaborn as sns
 import matplotlib.pyplot as plt
 # Load data
 df = pd.read_csv('crypto_data_clean.csv')
+df_stocks = df.copy()
+if df_stocks.index.name is None or df_stocks.index.name != df_stocks.columns[0]:
+    df_stocks = df_stocks.set_index(df.columns[0])
+df_stocks = df_stocks.transpose()
 
 df_reduced = pd.read_csv('crypto_data_reduced.csv')
 df_reduced = df_reduced[['Index', 'Cluster']]
@@ -22,13 +27,26 @@ df_reduced['Cluster'] = pd.to_numeric(df_reduced['Cluster'], errors='coerce')
 
 # # Load your data into a pandas DataFrame
 # df = pd.read_csv('crypto_data_reduced.csv')
-# df = df[['Index', 'Cluster']]  # Assuming these are the columns you want to keep
+# df = df[['Index', 'Cluster']]
 
 # Initialize the Dash app
 app = dash.Dash(__name__)
 
-# Define the app layout
+# Function to create a histogram and a box plot for a given stock
+# Function to create a histogram and a box plot for a given stock
+def create_stock_distribution(stock_name, stock_data):
+    # Create histogram
+    histogram = go.Figure(data=[go.Histogram(x=stock_data, nbinsx=30, name=f'Histogram of {stock_name}')])
+    histogram.update_layout(title_text=f'Histogram of {stock_name}', bargap=0.05)
 
+    # Create box plot
+    box_plot = go.Figure(data=[go.Box(y=stock_data, name=f'Box Plot of {stock_name}')])
+    box_plot.update_layout(title_text=f'Box Plot of {stock_name}')
+
+    return histogram, box_plot
+
+
+# Define the app layout
 app.layout = html.Div([
     # Create a sidebar for navigation
     html.Div([
@@ -39,8 +57,9 @@ app.layout = html.Div([
         dcc.Link("Refresh data", href="/loading", className="nav-link"),
         dcc.Link("Feature reduction", href="/pca", className="nav-link"),
         dcc.Link("Clustering", href="/clustering", className="nav-link"),
-        dcc.Link("EDA", href="/eda", className="nav-link"),
-        dcc.Link("Model Training", href="/models", className="nav-link"),
+        dcc.Link("Correlation", href="/correlation", className="nav-link"),
+        dcc.Link("Distribution", href="/distribution", className="nav-link"),
+        dcc.Link("Model Training", href="/training", className="nav-link"),
         dcc.Link("Forecasting", href="/forecasting", className="nav-link"),
     ], className="sidebar"),
 
@@ -53,6 +72,7 @@ app.layout = html.Div([
 # Define callback to update page content based on URL
 @app.callback(Output("page-content", "children"),
               [Input("url", "pathname")])
+
 def display_page(pathname):
     if pathname == "/clustering":
         # Here we add a DataTable to the "Clustering" page
@@ -69,7 +89,7 @@ def display_page(pathname):
                 style_table={'width': '50%'},  # Set the width of the table
             ),
         ])
-    elif pathname == "/eda":
+    elif pathname == "/correlation":
         html.H1(children='Stock Correlation Analysis'),
         # List of stocks to choose from
         stock_options = ['BTC-USD', 'ETH-USD', 'XRP-USD', 'LTC-USD']
@@ -99,10 +119,8 @@ def display_page(pathname):
         colorscale = [
             # Assign deep red to the most negative correlations
             [0.0, 'rgb(178,24,43)'],
-
             # Transition to lighter red for less negative correlations
             [1.0, 'rgb(239,138,98)']
-
         ]
         fig_positive = ff.create_annotated_heatmap(
             z=z_positive,
@@ -115,7 +133,6 @@ def display_page(pathname):
 
         fig_positive.update_layout(title='Top 10 Positive Correlations', xaxis={'title': 'Stock'},
                                    yaxis={'title': 'Correlation'})
-
         annotation_text_negative = [[f"{val:.2f}" for val in z_negative[0]]]  # Formatted text annotations
 
         # Now use these in your heatmap creation
@@ -141,11 +158,30 @@ def display_page(pathname):
                 html.Div([dcc.Graph(figure=fig_positive)], style={'flex': '1'}),
                 html.Div([dcc.Graph(figure=fig_negative)], style={'flex': '1'})
             ], style={'display': 'flex', 'flex-wrap': 'wrap'})
-
         ])
-        return html.H1("EDA Page Content")
-    elif pathname == "/models":
-        return html.H1("Models Page Content")
+        # return html.H1("EDA Page Content")
+    elif pathname == "/distribution":
+        html.H2("Distribution Analysis of  Stocks"),
+        histogram_fig1, box_plot_fig1 = create_stock_distribution('BTC-USD', df_stocks['BTC-USD'])
+        histogram_fig2, box_plot_fig2 = create_stock_distribution('ETH-USD', df_stocks['ETH-USD'])
+        histogram_fig3, box_plot_fig3 = create_stock_distribution('USDT-USD', df_stocks['USDT-USD'])
+        histogram_fig4, box_plot_fig4 = create_stock_distribution('MKR-USD', df_stocks['MKR-USD'])
+        return html.Div([
+            html.H1("Stock Distribution Analysis"),
+            # Div for each chart, set to inline-block to place them on the same line
+            html.Div([dcc.Graph(figure=histogram_fig1)], style={'display': 'inline-block', 'width': '25%'}),
+            html.Div([dcc.Graph(figure=histogram_fig2)], style={'display': 'inline-block', 'width': '25%'}),
+            html.Div([dcc.Graph(figure=histogram_fig3)], style={'display': 'inline-block', 'width': '25%'}),
+            html.Div([dcc.Graph(figure=histogram_fig4)], style={'display': 'inline-block', 'width': '25%'}),
+            # Div for each chart, set to inline-block to place them on the same line
+            html.Div([dcc.Graph(figure=box_plot_fig1)], style={'display': 'inline-block', 'width': '25%'}),
+            html.Div([dcc.Graph(figure=box_plot_fig2)], style={'display': 'inline-block', 'width': '25%'}),
+            html.Div([dcc.Graph(figure=box_plot_fig3)], style={'display': 'inline-block', 'width': '25%'}),
+            html.Div([dcc.Graph(figure=box_plot_fig4)], style={'display': 'inline-block', 'width': '25%'}),
+        ])
+
+    elif pathname == "/training":
+        return html.H1("Models training")
     elif pathname == "/forecasting":
         return html.H1("Forecasting Page Content")
     else:
