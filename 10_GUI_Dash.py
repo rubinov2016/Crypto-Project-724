@@ -10,6 +10,7 @@ from correlation import get_top_correlated_stocks
 import plotly.figure_factory as ff
 import plotly.graph_objs as go
 from scipy.stats import skew, kurtosis
+from scipy.stats import shapiro, normaltest, anderson
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -37,7 +38,6 @@ app = dash.Dash(__name__)
 # Function to create a histogram and a box plot for a given stock
 def create_stock_distribution(stock_name, stock_data):
 
-    print(stock_name, type(stock_data))
     # Create histogram
     histogram = go.Figure(data=[go.Histogram(x=stock_data, nbinsx=30, name=f'Histogram of {stock_name}')])
     histogram.update_layout(title_text=f'Histogram of {stock_name}', bargap=0.05)
@@ -51,9 +51,9 @@ def create_stock_distribution(stock_name, stock_data):
     mode_value = stock_data.mode().values[0]  # Mode can have multiple values; take the first one
     skewness = skew(stock_data)
     kurt = kurtosis(stock_data)
-
-    # return histogram, box_plot, mean_value, median_value, mode_value, skewness, kurt
-    return histogram, box_plot
+    stat_shapiro, p_value_shapiro = shapiro(stock_data)
+    return histogram, box_plot, mean_value, median_value, mode_value, skewness, kurt, stat_shapiro, p_value_shapiro
+    # return histogram, box_plot
 
 
 # Define the app layout
@@ -172,18 +172,60 @@ def display_page(pathname):
         # return html.H1("EDA Page Content")
     elif pathname == "/distribution":
         html.H2("Distribution Analysis of Stocks"),
-        histogram_fig1, box_plot_fig1 = create_stock_distribution('BTC-USD', df_stocks['BTC-USD'])
-        histogram_fig2, box_plot_fig2 = create_stock_distribution('ETH-USD', df_stocks['ETH-USD'])
-        histogram_fig3, box_plot_fig3 = create_stock_distribution('USDT-USD', df_stocks['USDT-USD'])
-        histogram_fig4, box_plot_fig4 = create_stock_distribution('MKR-USD', df_stocks['MKR-USD'])
-        # histogram_fig1, box_plot_fig1, mean_value, median_value, mode_value, skewness, kurt = create_stock_distribution(
-        #     'BTC-USD', df_stocks['BTC-USD'])
-        # histogram_fig2, box_plot_fig2, mean_value, median_value, mode_value, skewness, kurt = create_stock_distribution(
-        #     'ETH-USD', df_stocks['ETH-USD'])
-        # histogram_fig3, box_plot_fig3, mean_value, median_value, mode_value, skewness, kurt = create_stock_distribution(
-        #     'USDT-USD', df_stocks['USDT-USD'])
-        # histogram_fig4, box_plot_fig4, mean_value, median_value, mode_value, skewness, kurt = create_stock_distribution(
-        #     'MKR-USD', df_stocks['MKR-USD'])
+        # histogram_fig1, box_plot_fig1 = create_stock_distribution('BTC-USD', df_stocks['BTC-USD'])
+        # histogram_fig2, box_plot_fig2 = create_stock_distribution('ETH-USD', df_stocks['ETH-USD'])
+        # histogram_fig3, box_plot_fig3 = create_stock_distribution('USDT-USD', df_stocks['USDT-USD'])
+        # histogram_fig4, box_plot_fig4 = create_stock_distribution('MKR-USD', df_stocks['MKR-USD'])
+        histogram_fig1, box_plot_fig1, mean_value1, median_value1, mode_value1, skewness1, kurt1, stat_shapiro1, p_value_shapiro1 = create_stock_distribution(
+            'BTC-USD', df_stocks['BTC-USD'])
+        histogram_fig2, box_plot_fig2, mean_value2, median_value2, mode_value2, skewness2, kurt2,stat_shapiro2, p_value_shapiro2 = create_stock_distribution(
+            'ETH-USD', df_stocks['ETH-USD'])
+        histogram_fig3, box_plot_fig3, mean_value3, median_value3, mode_value3, skewness3, kurt3,stat_shapiro3, p_value_shapiro3 = create_stock_distribution(
+            'USDT-USD', df_stocks['USDT-USD'])
+        histogram_fig4, box_plot_fig4, mean_value4, median_value4, mode_value4, skewness4, kurt4,stat_shapiro4, p_value_shapiro4 = create_stock_distribution(
+            'MKR-USD', df_stocks['MKR-USD'])
+
+        # Add annotations for the statistics
+        histogram_fig1.add_annotation(
+            x=0.5,
+            y=0.95,
+            xref="paper",
+            yref="paper",
+            text=f"Mean: {mean_value1:.2f}<br>Median: {median_value1:.2f}<br>Mode: {mode_value1:.2f}<br>Skewness: {skewness1:.2f}<br>Kurtosis: {kurt1:.2f}<br>Shap stat: {stat_shapiro1:.2f}<br>Shap p_val: {p_value_shapiro1:.2f}",
+            showarrow=False,
+            font=dict(size=12),
+            align="center"
+        )
+        histogram_fig2.add_annotation(
+            x=0.5,
+            y=0.95,
+            xref="paper",
+            yref="paper",
+            text=f"Mean: {mean_value2:.2f}<br>Median: {median_value2:.2f}<br>Mode: {mode_value2:.2f}<br>Skewness: {skewness2:.2f}<br>Kurtosis: {kurt2:.2f}<br>Shap stat: {stat_shapiro2:.2f}<br>Shap p_val: {p_value_shapiro2:.2f}",
+            showarrow=False,
+            font=dict(size=12),
+            align="center"
+        )
+        histogram_fig3.add_annotation(
+            x=0.5,
+            y=0.95,
+            xref="paper",
+            yref="paper",
+            text=f"Mean: {mean_value3:.2f}<br>Median: {median_value3:.2f}<br>Mode: {mode_value3:.2f}<br>Skewness: {skewness3:.2f}<br>Kurtosis: {kurt3:.2f}<br>Shap stat: {stat_shapiro3:.2f}<br>Shap p_val: {p_value_shapiro3:.2f}",
+            showarrow=False,
+            font=dict(size=12),
+            align="center"
+        )
+        histogram_fig4.add_annotation(
+            x=0.5,
+            y=0.95,
+            xref="paper",
+            yref="paper",
+            text=f"Mean: {mean_value4:.2f}<br>Median: {median_value4:.2f}<br>Mode: {mode_value4:.2f}<br>Skewness: {skewness4:.2f}<br>Kurtosis: {kurt4:.2f}<br>Shap stat: {stat_shapiro4:.2f}<br>Shap p_val: {p_value_shapiro4:.2f}",
+            showarrow=False,
+            font=dict(size=12),
+            align="center"
+        )
 
         return html.Div([
             html.H1("Stock Distribution Analysis"),
