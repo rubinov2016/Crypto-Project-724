@@ -9,15 +9,21 @@ from datetime import timedelta
 def SVR_forecasting(model, recent_data, n_steps, lag =5):
     scaler = StandardScaler()
     future_forecast = []
+    print(type(recent_data))
+    print(recent_data)
     input_features = recent_data[-lag:].reshape(1, -1)  # Reshape for a single sample
     # Fit the scaler to your data
     print()
     scaler.fit(input_features)
+    print(input_features)
     for i in range(n_steps):
         # Scale input features
         input_features_scaled = scaler.transform(input_features)
+        print(i, input_features_scaled)
         # Forecast the next step
+        print(2)
         next_step = model.predict(input_features_scaled)
+        print(input_features_scaled)
         # Append the forecasted value
         future_forecast.append(next_step.item())
         # Update the input features to include the new prediction
@@ -35,6 +41,7 @@ if __name__ == "__main__":
     df.rename(columns={df.columns[0]: 'Price'}, inplace=True)
     # data = df['Price'].values.reshape(-1, 1)
     data = df['Price'].values
+    print(data)
     future_steps = 100  # Number of days to forecast
     # # Ensure `recent_data` contains at least `lag` recent observations (not scaled)
     # data = data[-lag:]

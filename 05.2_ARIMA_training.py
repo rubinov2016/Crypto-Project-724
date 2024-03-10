@@ -3,11 +3,7 @@ from statsmodels.tsa.arima.model import ARIMA
 from datetime import timedelta
 import pickle
 
-def ARIMA_training(name):
-    df = pd.read_csv('crypto_data_clean.csv')
-    df = df[df['Symbol'] == name].drop(['Symbol'], axis=1).T
-    df.index.name = 'Date'
-    df.columns = ['Price']
+def ARIMA_training(df):
     # Choose the ARIMA Model parameters (p, d, q)
     # These should be chosen based on model diagnostics like ACF, PACF plots or grid search
     p = 2  # AR term
@@ -23,7 +19,19 @@ def ARIMA_training(name):
         pickle.dump(model_fit, pkl)
 
     # Summary of the model
-    print(model_fit.summary())
+    return model_fit.summary()
 
 if __name__ == "__main__":
-    ARIMA_training('BTC-USD')
+    name = 'BTC-USD'
+    df = pd.read_csv('crypto_data_clean.csv')
+    df = df[df['Symbol'] == name].drop(['Symbol'], axis=1).T
+    df.index.name = 'Date'
+    df.columns = ['Price']
+
+    future_steps = 30
+    # predictions = LSTM_forecasting(df, 30, scaler_name, keras_name, dataset_name, future_steps)
+    summary = ARIMA_training(df)
+    print(type(summary))
+    print(summary)
+    df.to_json('ARIMA_historical.json', orient='index')
+

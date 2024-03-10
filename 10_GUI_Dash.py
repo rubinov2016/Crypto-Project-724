@@ -12,7 +12,7 @@ import plotly.graph_objs as go
 from scipy.stats import skew, kurtosis
 from scipy.stats import shapiro, normaltest, anderson
 import pandas as pd
-from LSTM_forecasting import LSTM_forecasting
+# from LSTM_forecasting import LSTM_forecasting
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
 from joblib import load as joblib_load
@@ -41,7 +41,26 @@ df_reduced['Cluster'] = pd.to_numeric(df_reduced['Cluster'], errors='coerce')
 # Initialize the Dash app
 app = dash.Dash(__name__)
 
-# Function to create a histogram and a box plot for a given stock
+#Charts for ML models
+def Model_chart(df1, df2, name):
+    return dcc.Graph(id='historical-forecast-chart',
+          figure={
+              'data': [
+                  go.Scatter(x=df1.index, y=df1['Price'], mode='lines',
+                             name='Historical', line=dict(color='blue')),
+                  go.Scatter(x=df2.index, y=df2['Price'], mode='lines+markers',
+                             name='Forecasted', line=dict(color='red'))
+              ],
+              'layout': go.Layout(
+                  title=name + ' Historical vs. Forecasted Values',
+                  xaxis={'title': 'Date'},
+                  yaxis={'title': 'Value'},
+                  hovermode='closest'
+              )
+          }
+    )
+
+
 # Function to create a histogram and a box plot for a given stock
 def create_stock_distribution(stock_name, stock_data):
 
@@ -251,24 +270,19 @@ def display_page(pathname):
     elif pathname == "/training":
         return html.H1("Models training")
     elif pathname == "/forecasting":
-        df_historical = pd.read_json('LSTM_historical.json', orient='index')
-        df_forecasted = pd.read_json('LSTM_forecast.json', orient='index')
+        df_LTSM_historical = pd.read_json('LSTM_historical.json', orient='index')
+        df_LTSM_forecasted = pd.read_json('LSTM_forecast.json', orient='index')
+        df_ARIMA_historical = pd.read_json('ARIMA_historical.json', orient='index')
+        df_ARIMA_forecasted = pd.read_json('ARIMA_forecast.json', orient='index')
+        df_Prophet_historical = pd.read_json('Prophet_historical.json', orient='index')
+        df_Prophet_forecasted = pd.read_json('Prophet_forecast.json', orient='index')
+        df_ARIMA_historical = pd.read_json('ARIMA_historical.json', orient='index')
+        df_ARIMA_forecasted = pd.read_json('ARIMA_forecast.json', orient='index')
         return html.Div([
-            dcc.Graph(id='historical-forecast-chart',
-                        figure={
-                            'data': [
-                                go.Scatter(x=df_historical.index, y=df_historical['Price'], mode='lines', name='Historical', line=dict(color='blue')),
-                                go.Scatter(x=df_forecasted.index, y=df_forecasted['Price'], mode='lines+markers', name='Forecasted', line=dict(color='red'))
-                            ],
-                            'layout': go.Layout(
-                                title='Historical vs. Forecasted Values',
-                                xaxis={'title': 'Date'},
-                                yaxis={'title': 'Value'},
-                                hovermode='closest'
-                            )
-                        }
-                )
-        ])
+            Model_chart(df_LTSM_historical,df_LTSM_forecasted, 'LSTM'),
+            Model_chart(df_ARIMA_historical, df_ARIMA_forecasted, 'ARIMA'),
+            Model_chart(df_Prophet_historical, df_Prophet_forecasted, 'Prophet')
+            ])
     else:
         # Default to home when nothing else is matched
         return html.H1("Home Page Content")

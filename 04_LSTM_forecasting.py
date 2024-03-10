@@ -42,13 +42,11 @@ def LSTM_forecasting(df, days, scaler_name, keras_name,dataset_name,future_steps
     # df = pd.read_csv('our_data.csv')
      # print(df)
     # Normalize the data
+    df.to_json('LSTM_historical.json', orient='index')
     scaler = MinMaxScaler()
     scaled_data = scaler.fit_transform(df)
-
     model = load_model(keras_name)
-
     future_predictions = forecast_future(future_steps, model, scaled_data, scaler)
-
     last_date = pd.to_datetime(df.index[-1])
     # Create a date range for future predictions
     future_dates = [last_date + timedelta(days=x) for x in range(1, future_steps + 1)]
@@ -59,7 +57,7 @@ def LSTM_forecasting(df, days, scaler_name, keras_name,dataset_name,future_steps
     #     'Predicted_Price': future_predictions.flatten()  # Flatten the predictions array if necessary
     # })
     future_predictions_with_dates =pd.DataFrame(future_predictions, index=future_dates, columns=['Price'])
-    return future_predictions_with_dates
+    future_predictions_with_dates.to_json('LSTM_forecast.json', orient='index')
 
 if __name__ == "__main__":
     name = 'BTC-USD'
@@ -72,7 +70,5 @@ if __name__ == "__main__":
     keras_name = name+'_LTSM.keras'
     dataset_name = name + '_crypto_data.csv'
     future_steps = 30
-    predictions = LSTM_forecasting(df,30, scaler_name, keras_name,dataset_name,future_steps)
-    df.to_json('LSTM_historical.json', orient='index')
-    predictions.to_json('LSTM_forecast.json', orient='index')
-        # print(f"{value[0]}, {value[1]:.2f}")
+    LSTM_forecasting(df,30, scaler_name, keras_name,dataset_name,future_steps)
+
