@@ -16,7 +16,7 @@ scaler = StandardScaler()
 data_standardized = scaler.fit_transform(data)
 
 # Step 3: Apply PCA
-pca = PCA(n_components=10)  # Adjust n_components to your desired number of features
+pca = PCA(n_components=10)  # Adjust n_components to our desired number of features
 data_reduced = pca.fit_transform(data_standardized)
 
 # Step 4: Reattach the index column to the PCA-reduced data
@@ -27,7 +27,7 @@ reduced_df.insert(0, 'Index', index_col)
 kmeans = KMeans(n_clusters=4, random_state=42)
 clusters = kmeans.fit_predict(data_reduced)
 
-# Add the cluster labels to your reduced DataFrame
+# Add the cluster labels to our reduced DataFrame
 reduced_df['Cluster'] = clusters
 
 # Convert data_reduced to a DataFrame for easier plotting

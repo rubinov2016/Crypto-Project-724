@@ -11,6 +11,13 @@ import plotly.figure_factory as ff
 import plotly.graph_objs as go
 from scipy.stats import skew, kurtosis
 from scipy.stats import shapiro, normaltest, anderson
+import pandas as pd
+from LSTM_forecasting import LSTM_forecasting
+from tensorflow.keras.models import load_model
+from sklearn.preprocessing import MinMaxScaler
+from joblib import load as joblib_load
+import numpy as np
+from datetime import timedelta
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -27,7 +34,7 @@ df_reduced = df_reduced[['Index', 'Cluster']]
 df_reduced.rename(columns={'Index': 'Stock'}, inplace=True)
 df_reduced['Cluster'] = pd.to_numeric(df_reduced['Cluster'], errors='coerce')
 
-# # Load your data into a pandas DataFrame
+# # Load our data into a pandas DataFrame
 # df = pd.read_csv('crypto_data_reduced.csv')
 # df = df[['Index', 'Cluster']]
 
@@ -104,7 +111,7 @@ def display_page(pathname):
         # List of stocks to choose from
         stock_options = ['BTC-USD', 'ETH-USD', 'XRP-USD', 'LTC-USD']
         # Specify the target stock symbol you're interested in
-        target_symbol = 'BTC-USD'  # Replace with your target stock symbol
+        target_symbol = 'BTC-USD'  # Replace with our target stock symbol
 
         # Use the function to get top correlated stocks
         top_positive, top_negative = get_top_correlated_stocks(target_symbol, df, n=10)
@@ -124,7 +131,7 @@ def display_page(pathname):
         x_negative = top_negative_df['Stock'].values.tolist()  # List
 
         # Generate heatmaps using Plotly Figure Factory
-        # Now use these in your heatmap creation
+        # Now use these in our heatmap creation
         # Define a custom colorscale
         colorscale = [
             # Assign deep red to the most negative correlations
@@ -145,7 +152,7 @@ def display_page(pathname):
                                    yaxis={'title': 'Correlation'})
         annotation_text_negative = [[f"{val:.2f}" for val in z_negative[0]]]  # Formatted text annotations
 
-        # Now use these in your heatmap creation
+        # Now use these in our heatmap creation
         fig_negative = ff.create_annotated_heatmap(
             z=z_negative,
             x=x_negative,
@@ -244,7 +251,24 @@ def display_page(pathname):
     elif pathname == "/training":
         return html.H1("Models training")
     elif pathname == "/forecasting":
-        return html.H1("Forecasting Page Content")
+        df_historical = pd.read_json('LSTM_historical.json', orient='index')
+        df_forecasted = pd.read_json('LSTM_forecast.json', orient='index')
+        return html.Div([
+            dcc.Graph(id='historical-forecast-chart',
+                        figure={
+                            'data': [
+                                go.Scatter(x=df_historical.index, y=df_historical['Price'], mode='lines', name='Historical', line=dict(color='blue')),
+                                go.Scatter(x=df_forecasted.index, y=df_forecasted['Price'], mode='lines+markers', name='Forecasted', line=dict(color='red'))
+                            ],
+                            'layout': go.Layout(
+                                title='Historical vs. Forecasted Values',
+                                xaxis={'title': 'Date'},
+                                yaxis={'title': 'Value'},
+                                hovermode='closest'
+                            )
+                        }
+                )
+        ])
     else:
         # Default to home when nothing else is matched
         return html.H1("Home Page Content")

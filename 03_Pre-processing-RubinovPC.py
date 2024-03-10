@@ -48,7 +48,7 @@ print(f"Number of principal components: {num_components}")
 kmeans = KMeans(n_clusters=4, init='k-means++', random_state=42)
 clusters = kmeans.fit_predict(data_reduced)
 
-# Add the cluster labels to your reduced DataFrame
+# Add the cluster labels to our reduced DataFrame
 reduced_df['Cluster'] = clusters
 reduced_df.to_csv('crypto_data_reduced.csv')
 # Convert data_reduced to a DataFrame for easier plotting
