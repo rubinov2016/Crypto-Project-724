@@ -37,7 +37,7 @@ def forecast_future(steps_to_predict, model, last_known_sequence, scaler):
     return predictions
 
 
-def LSTM_forecasting(df, days, scaler_name, keras_name,dataset_name,future_steps):
+def LSTM_forecasting(df, keras_name,future_steps):
     # Load the dataset (assuming df is our DataFrame as shown in the picture)
     # df = pd.read_csv('our_data.csv')
      # print(df)
@@ -50,12 +50,7 @@ def LSTM_forecasting(df, days, scaler_name, keras_name,dataset_name,future_steps
     last_date = pd.to_datetime(df.index[-1])
     # Create a date range for future predictions
     future_dates = [last_date + timedelta(days=x) for x in range(1, future_steps + 1)]
-    #
-    # # Combine future dates with predictions
-    # future_predictions_with_dates = pd.DataFrame({
-    #     'Date': future_dates,
-    #     'Predicted_Price': future_predictions.flatten()  # Flatten the predictions array if necessary
-    # })
+
     future_predictions_with_dates =pd.DataFrame(future_predictions, index=future_dates, columns=['Price'])
     future_predictions_with_dates.to_json('LSTM_forecast.json', orient='index')
 
@@ -70,5 +65,5 @@ if __name__ == "__main__":
     keras_name = name+'_LTSM.keras'
     dataset_name = name + '_crypto_data.csv'
     future_steps = 30
-    LSTM_forecasting(df,30, scaler_name, keras_name,dataset_name,future_steps)
+    LSTM_forecasting(df,30, keras_name, future_steps)
 

@@ -42,7 +42,7 @@ df_reduced['Cluster'] = pd.to_numeric(df_reduced['Cluster'], errors='coerce')
 app = dash.Dash(__name__)
 
 #Charts for ML models
-def Model_chart(df1, df2, name):
+def Model_chart(df1, df2, metrics, name):
     return dcc.Graph(id='historical-forecast-chart',
           figure={
               'data': [
@@ -55,7 +55,19 @@ def Model_chart(df1, df2, name):
                   title=name + ' Historical vs. Forecasted Values',
                   xaxis={'title': 'Date'},
                   yaxis={'title': 'Value'},
-                  hovermode='closest'
+                  hovermode='closest',
+                  annotations=[
+                      dict(
+                          xref='paper', yref='paper',
+                          x=0, y=1 - 0.05 * i,  # Adjust y position for each annotation
+                          xanchor='left', yanchor='bottom',
+                          text=f"{metric}: {value:.3f}" if metric != 'mape' else f"{metric}: {value:.2f}%",
+                          font=dict(family='Arial', size=12),
+                          showarrow=False,
+                          align='left'
+                      ) for i, (metric, value) in enumerate(metrics.items())
+                  ],
+                  margin=dict(b=100)
               )
           }
     )
@@ -276,12 +288,15 @@ def display_page(pathname):
         df_ARIMA_forecasted = pd.read_json('ARIMA_forecast.json', orient='index')
         df_Prophet_historical = pd.read_json('Prophet_historical.json', orient='index')
         df_Prophet_forecasted = pd.read_json('Prophet_forecast.json', orient='index')
-        df_ARIMA_historical = pd.read_json('ARIMA_historical.json', orient='index')
-        df_ARIMA_forecasted = pd.read_json('ARIMA_forecast.json', orient='index')
+        df_SVR_historical = pd.read_json('SVR_historical.json', orient='index')
+        df_SVR_forecasted = pd.read_json('SVR_forecast.json', orient='index')
+        LSTM_metrics = pd.read_json('LSTM_metrics.json', typ='series')
+        ARIMA_metrics = pd.read_json('ARIMA_metrics.json', typ='series')
         return html.Div([
-            Model_chart(df_LTSM_historical,df_LTSM_forecasted, 'LSTM'),
-            Model_chart(df_ARIMA_historical, df_ARIMA_forecasted, 'ARIMA'),
-            Model_chart(df_Prophet_historical, df_Prophet_forecasted, 'Prophet')
+            Model_chart(df_LTSM_historical, df_LTSM_forecasted, LSTM_metrics, 'LSTM'),
+            Model_chart(df_ARIMA_historical, df_ARIMA_forecasted, ARIMA_metrics, 'ARIMA'),
+            Model_chart(df_Prophet_historical, df_Prophet_forecasted, LSTM_metrics, 'Prophet'),
+            Model_chart(df_SVR_historical, df_SVR_forecasted, LSTM_metrics, 'SVR')
             ])
     else:
         # Default to home when nothing else is matched

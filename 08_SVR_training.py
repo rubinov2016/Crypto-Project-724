@@ -12,29 +12,44 @@ import matplotlib.pyplot as plt
 import pickle
 from datetime import timedelta
 
-def lag_features(data, lag=1):
+def lag_features(data, lag=5):
     X, y = [], []
     for i in range(lag, len(data)):
         X.append(data[i-lag:i])
         y.append(data[i])
     return np.array(X), np.array(y)
 
-def SVR_training(df, name, lag=5):
+def SVR_training(df, name, lag=1):
     df.to_json('SVR_historical.json', orient='index')
     data = df['Price'].values
-    # Create lagged features, using 10 past values to predict the next value
+    # Create lagged features, using ?? past values to predict the next value
     X, y = lag_features(data, lag)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+    print(len(X))
+    print(len(y))
+    print(len(data))
+    # cutoff = len(X)-30
+    X_train = X[:-30]
+    X_test = X[-30:]
+    y_train = y[:-30]
+    y_test = y[-30:]
+    print(22,X_test)
+    print(33,y_test)
+
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, shuffle=False)
+    # print(100, X_test)
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
-    print(X_train)
+    # print(X_train)
     X_test_scaled = scaler.transform(X_test)
-    svr_model = SVR(C=1.0, epsilon=0.1)
+    # svr_model = SVR(C=1.0, epsilon=0.1)
+    svr_model = SVR(C=0.001, epsilon=0.3, gamma=0.1, kernel='rbf')
     svr_model.fit(X_train_scaled, y_train.ravel())
 
     with open(name+'_SVR.pkl', 'wb') as pkl:
         pickle.dump(svr_model, pkl)
+
     y_pred = svr_model.predict(X_test_scaled)
+    print(4, y_pred)
     mse = mean_squared_error(y_test, y_pred)
     rmse = math.sqrt(mse)
     mae = mean_absolute_error(y_test, y_pred)
@@ -43,6 +58,8 @@ def SVR_training(df, name, lag=5):
     print("Test RMSE:", rmse)
     print("Test MAE:", mae)
     print("Test r2:", r2)
+
+
     y_pred_unscaled = y_pred.reshape(-1, 1)
     # y_pred_unscaled= scaler.inverse_transform(y_pred_unscaled)
     # print(y_pred_unscaled)
@@ -50,9 +67,11 @@ def SVR_training(df, name, lag=5):
     X_plot = data[lag:]
     # print(len(X_plot))
 
+    plt.plot(X_plot, label='Actual Data', marker='o')  # Plot array1 with circle markers
+    plt.plot(y_pred, label='Predicted Data', marker='x')  # Plot array2 with x markers
+
     # plot the predicted values against the true values
-    plt.scatter(X_plot, y, color='darkorange',
-                label='data')
+    # plt.scatter(X_plot, y, color='darkorange',                label='data')
     # plt.plot(X_plot, y_pred, color='cornflowerblue',
     #           label='prediction')
     plt.legend()
@@ -71,6 +90,7 @@ def SVR_forecasting(df, name,  n_steps, lag =5):
     # input_features = data[-lag:]  # Reshape for a single sample
     # Fit the scaler to your data
     scaler.fit(input_features)
+
     for i in range(n_steps):
         # Scale input features
         input_features_scaled = scaler.transform(input_features)
@@ -81,21 +101,14 @@ def SVR_forecasting(df, name,  n_steps, lag =5):
         # Update the input features to include the new prediction
         input_features = np.roll(input_features, -1)
         input_features[0, -1] = next_step
-    # forecasted_unscaled = scaler.inverse_transform(future_forecast)
-    # predictions = pd.DataFrame(future_forecast, columns=['Price'])
-    # print('p', predictions)
     last_date = pd.to_datetime(df.index[-1])
-    # Create a date range for future predictions
     future_dates = [last_date + timedelta(days=x) for x in range(1, future_steps + 1)]
-    dates_index = pd.to_datetime(future_dates)
-    # future_predictions_with_dates  = pd.DataFrame(predictions, index=dates_index, columns=['Price'])
-    # print(type(future_dates))
     future_predictions_with_dates = pd.DataFrame(future_forecast, index=future_dates, columns=['Price'])
     print(future_predictions_with_dates)
 
     future_predictions_with_dates.index = future_predictions_with_dates.index.strftime('%Y-%m-%d')
     print(future_predictions_with_dates)
-    future_predictions_with_dates.to_json('SVR_forecasting.json', date_format='iso', orient='index')
+    future_predictions_with_dates.to_json('SVR_forecast.json', date_format='iso', orient='index')
 
 if __name__ == "__main__":
     lag = 5
@@ -106,5 +119,7 @@ if __name__ == "__main__":
     df.index.name = 'Date'
     df.columns = ['Price']
     # print(df)
-    # SVR_training(df, 'BTC-USD',lag)
-    SVR_forecasting(df, 'BTC-USD', n_steps=future_steps, lag=lag)
+    SVR_training(df, 'BTC-USD',lag)
+    df_last_lag = df.tail(lag)
+    # print(df_last_lag)
+    # SVR_forecasting(df_last_lag, 'BTC-USD', n_steps=future_steps, lag=lag)
