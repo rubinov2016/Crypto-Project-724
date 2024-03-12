@@ -44,9 +44,9 @@ def LSTM_training(df, name, sequence_length=30, epochs=10):
     rmse = sqrt(mse)
     # Calculate MAPE - Avoid division by zero by adding a small number to the denominator
     mape = np.mean(np.abs((y_test - y_pred) / (y_test + 1e-10))) * 100
-
     # Calculate R-squared
     r_squared = r2_score(y_test, y_pred)
+    print(987,r_squared)
 
     metrics = {
         "mse": mse,

@@ -65,7 +65,6 @@ def Prophet_forecasting(df, name, future_steps):
     prediction.set_index('ds', inplace=True)
     prediction.rename(columns={'yhat': 'Price'}, inplace=True)
     prediction = prediction[['Price']]
-
     prediction.to_json('Prophet_forecast.json', date_format='iso', orient='index')
 
     # Plot the forecast
