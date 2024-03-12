@@ -292,11 +292,13 @@ def display_page(pathname):
         df_SVR_forecasted = pd.read_json('SVR_forecast.json', orient='index')
         LSTM_metrics = pd.read_json('LSTM_metrics.json', typ='series')
         ARIMA_metrics = pd.read_json('ARIMA_metrics.json', typ='series')
+        SVR_metrics = pd.read_json('SVR_metrics.json', typ='series')
+        Prophet_metrics = pd.read_json('Prophet_metrics.json', typ='series')
         return html.Div([
             Model_chart(df_LTSM_historical, df_LTSM_forecasted, LSTM_metrics, 'LSTM'),
             Model_chart(df_ARIMA_historical, df_ARIMA_forecasted, ARIMA_metrics, 'ARIMA'),
-            Model_chart(df_Prophet_historical, df_Prophet_forecasted, LSTM_metrics, 'Prophet'),
-            Model_chart(df_SVR_historical, df_SVR_forecasted, LSTM_metrics, 'SVR')
+            Model_chart(df_Prophet_historical, df_Prophet_forecasted, Prophet_metrics, 'Prophet'),
+            Model_chart(df_SVR_historical, df_SVR_forecasted, SVR_metrics, 'SVR')
             ])
     else:
         # Default to home when nothing else is matched

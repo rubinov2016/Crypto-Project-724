@@ -11,6 +11,9 @@ from joblib import dump
 import matplotlib.pyplot as plt
 import pickle
 from datetime import timedelta
+import json
+from scipy import stats
+
 
 def lag_features(data, lag=5):
     X, y = [], []
@@ -24,19 +27,13 @@ def SVR_training(df, name, lag=1):
     data = df['Price'].values
     # Create lagged features, using ?? past values to predict the next value
     X, y = lag_features(data, lag)
-    print(len(X))
-    print(len(y))
-    print(len(data))
-    # cutoff = len(X)-30
+
     X_train = X[:-30]
     X_test = X[-30:]
     y_train = y[:-30]
     y_test = y[-30:]
-    print(22,X_test)
-    print(33,y_test)
 
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, shuffle=False)
-    # print(100, X_test)
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     # print(X_train)
@@ -49,15 +46,36 @@ def SVR_training(df, name, lag=1):
         pickle.dump(svr_model, pkl)
 
     y_pred = svr_model.predict(X_test_scaled)
-    print(4, y_pred)
+    # print(4, y_pred)
     mse = mean_squared_error(y_test, y_pred)
     rmse = math.sqrt(mse)
     mae = mean_absolute_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
-    print("Test MSE:", mse)
-    print("Test RMSE:", rmse)
-    print("Test MAE:", mae)
-    print("Test r2:", r2)
+    # Calculate MAPE - Avoid division by zero by adding a small number to the denominator
+    mape1 = np.mean(np.abs((y_test - y_pred) / (y_test + 1e-10))) * 100
+    print(mape1)
+    test = y_test
+    errors = test
+
+    # Printing each error, symbolizing a "circular" iteration
+    print("Starting error circle:")
+    for i, value in enumerate(test):
+        errors[i] = np.abs((test[i] - y_pred[i]) / test[i])
+        # print(i, errors[i])
+        # print(f"{test[i]}, {predictions[i]}, {np.abs(test[i]- predictions[i])/test[i]} Error {i}: {error:.2f}%")
+    mape = errors.mean()* 100
+    print(mape)
+    slope, intercept, r_value, p_value, std_err = stats.linregress(y_test, y_pred)
+    r2 = r_value ** 2
+    r_squared = r2
+
+    metrics = {
+        "mse": mse,
+        "rmse": rmse,
+        "mape": mape,
+        "r_squared": r_squared
+    }
+    with open('SVR_metrics.json', 'w') as file:
+        json.dump(metrics, file)
 
 
     y_pred_unscaled = y_pred.reshape(-1, 1)
@@ -109,6 +127,7 @@ def SVR_forecasting(df, name,  n_steps, lag =5):
     future_predictions_with_dates.index = future_predictions_with_dates.index.strftime('%Y-%m-%d')
     print(future_predictions_with_dates)
     future_predictions_with_dates.to_json('SVR_forecast.json', date_format='iso', orient='index')
+
 
 if __name__ == "__main__":
     lag = 5
