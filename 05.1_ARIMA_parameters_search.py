@@ -41,7 +41,8 @@ def ARIMA_parameter_search(name):
         except Exception as e:
             continue
 
-    print(f"Best ARIMA model: ARIMA{best_pdq} with AIC: {best_aic}")
+    print(f"Best ARIMA model:")
+    print(f"ARIMA{best_pdq} with AIC: {best_aic}")
 
     # Save the best ARIMA model to disk
     best_model.save('best_arima_model.pkl')

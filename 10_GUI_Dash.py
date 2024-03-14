@@ -89,8 +89,9 @@ def create_stock_distribution(stock_name, stock_data):
     mode_value = stock_data.mode().values[0]  # Mode can have multiple values; take the first one
     skewness = skew(stock_data)
     kurt = kurtosis(stock_data)
+    std_dev = stock_data.std()
     stat_shapiro, p_value_shapiro = shapiro(stock_data)
-    return histogram, box_plot, mean_value, median_value, mode_value, skewness, kurt, stat_shapiro, p_value_shapiro
+    return histogram, box_plot, mean_value, median_value, std_dev, mode_value, skewness, kurt, stat_shapiro, p_value_shapiro
     # return histogram, box_plot
 
 
@@ -126,7 +127,6 @@ def display_page(pathname):
         # Here we add a DataTable to the "Clustering" page
         return html.Div([
             html.H1("Clustering Page Content"),
-
             dash_table.DataTable(
                 id='table',
                 columns=[{"name": i, "id": i, 'deletable': True, "type": "numeric" if i == "Cluster" else "text"} for i in df_reduced.columns],
@@ -214,13 +214,13 @@ def display_page(pathname):
         # histogram_fig2, box_plot_fig2 = create_stock_distribution('ETH-USD', df_stocks['ETH-USD'])
         # histogram_fig3, box_plot_fig3 = create_stock_distribution('USDT-USD', df_stocks['USDT-USD'])
         # histogram_fig4, box_plot_fig4 = create_stock_distribution('MKR-USD', df_stocks['MKR-USD'])
-        histogram_fig1, box_plot_fig1, mean_value1, median_value1, mode_value1, skewness1, kurt1, stat_shapiro1, p_value_shapiro1 = create_stock_distribution(
+        histogram_fig1, box_plot_fig1, mean_value1, median_value1, mode_value1, st_dev1,  skewness1, kurt1, stat_shapiro1, p_value_shapiro1 = create_stock_distribution(
             'BTC-USD', df_stocks['BTC-USD'])
-        histogram_fig2, box_plot_fig2, mean_value2, median_value2, mode_value2, skewness2, kurt2,stat_shapiro2, p_value_shapiro2 = create_stock_distribution(
+        histogram_fig2, box_plot_fig2, mean_value2, median_value2, mode_value2, st_dev2,  skewness2, kurt2,stat_shapiro2, p_value_shapiro2 = create_stock_distribution(
             'ETH-USD', df_stocks['ETH-USD'])
-        histogram_fig3, box_plot_fig3, mean_value3, median_value3, mode_value3, skewness3, kurt3,stat_shapiro3, p_value_shapiro3 = create_stock_distribution(
+        histogram_fig3, box_plot_fig3, mean_value3, median_value3, mode_value3, st_dev3, skewness3, kurt3,stat_shapiro3, p_value_shapiro3 = create_stock_distribution(
             'USDT-USD', df_stocks['USDT-USD'])
-        histogram_fig4, box_plot_fig4, mean_value4, median_value4, mode_value4, skewness4, kurt4,stat_shapiro4, p_value_shapiro4 = create_stock_distribution(
+        histogram_fig4, box_plot_fig4, mean_value4, median_value4, mode_value4, st_dev4, skewness4, kurt4,stat_shapiro4, p_value_shapiro4 = create_stock_distribution(
             'MKR-USD', df_stocks['MKR-USD'])
 
         # Add annotations for the statistics
@@ -229,7 +229,7 @@ def display_page(pathname):
             y=0.95,
             xref="paper",
             yref="paper",
-            text=f"Mean: {mean_value1:.2f}<br>Median: {median_value1:.2f}<br>Mode: {mode_value1:.2f}<br>Skewness: {skewness1:.2f}<br>Kurtosis: {kurt1:.2f}<br>Shap stat: {stat_shapiro1:.2f}<br>Shap p_val: {p_value_shapiro1:.2f}",
+            text=f"Mean: {mean_value1:.2f}<br>Median: {median_value1:.2f}<br>Mode: {mode_value1:.2f}<br>St dev: {st_dev1:.2f}<br>Skewness: {skewness1:.2f}<br>Kurtosis: {kurt1:.2f}<br>Shap stat: {stat_shapiro1:.2f}<br>Shap p_val: {p_value_shapiro1:.2f}",
             showarrow=False,
             font=dict(size=12),
             align="center"

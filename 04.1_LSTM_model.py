@@ -17,22 +17,20 @@ def LSTM_training(df, name, sequence_length=30, epochs=10):
     df.to_csv(name+'_crypto_data.csv', header=True)
     scaler = MinMaxScaler()
     scaled_data = scaler.fit_transform(df)
-    # Split the data into training and test sets
+    # Split the data
     df_train, df_test = train_test_split(scaled_data, test_size=0.2, shuffle=False)
-    # Use TimeseriesGenerator to create training and test sequences
+    # Create training and test sequences
     train_generator = TimeseriesGenerator(df_train, df_train,
                                           length=sequence_length, batch_size=1)
     test_generator = TimeseriesGenerator(df_test, df_test,
                                          length=sequence_length, batch_size=1)
-    # Build the LSTM model_test
+    # Build the LSTM test model
     model = Sequential([
         LSTM(50, activation='relu', input_shape=(sequence_length, 1), return_sequences=True),
         LSTM(50, activation='relu'),
         Dense(1)
     ])
     model.compile(optimizer='adam', loss='mse')
-
-    # Train the model_test
     model.fit(train_generator, epochs=epochs)
 
     # Predict on the test data

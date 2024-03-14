@@ -6,9 +6,11 @@ import matplotlib.pyplot as plt
 def get_top_correlated_stocks(stock_symbol, df, n=10):
     if df.index.name is None or df.index.name != df.columns[0]:
         df = df.set_index(df.columns[0])
+    print(df)
     df = df.transpose()
     # Calculate correlation matrix
     correlation_matrix = df.corr()
+    # print(correlation_matrix)
     # Get the correlations for the specified stock
     # Ensure that 'stock_symbol' is actually in the correlation matrix
     if stock_symbol in correlation_matrix.columns:
@@ -21,7 +23,6 @@ def get_top_correlated_stocks(stock_symbol, df, n=10):
         raise ValueError(f"Stock symbol '{stock_symbol}' not found in DataFrame.")
     # Find the top-n positively correlated stocks
     top_positive = correlations.nlargest(n)
-
     # Find the top-n negatively correlated stocks
     top_negative = correlations.nsmallest(n)
     return top_positive, top_negative
