@@ -74,7 +74,7 @@ def Prophet_forecasting(df, name, future_steps):
 if __name__ == "__main__":
     name = 'BTC-USD'
     future_steps = 30
-    df = pd.read_csv('crypto_data_clean.csv')
+    df = pd.read_csv('crypto_data_clean2.csv')
     df = df[df['Symbol'] == name].drop(['Symbol'], axis=1).T
     df.index.name = 'Date'
     df.columns = ['Price']

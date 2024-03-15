@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def get_top_correlated_stocks(stock_symbol, df, n=10):
+def get_top_correlated_stocks(stock_symbol, df, n=5):
     if df.index.name is None or df.index.name != df.columns[0]:
         df = df.set_index(df.columns[0])
     print(df)

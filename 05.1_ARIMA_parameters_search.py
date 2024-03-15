@@ -6,7 +6,7 @@ import warnings
 
 def ARIMA_parameter_search(name):
     # Load the dataset
-    df = pd.read_csv('crypto_data_clean.csv')
+    df = pd.read_csv('crypto_data_clean2.csv')
     df = df[df['Symbol'] == name].drop(['Symbol'], axis=1).T
     # df['Date'] = pd.to_datetime(df['Date'])
     # df.set_index('Date', inplace=True)
@@ -33,7 +33,8 @@ def ARIMA_parameter_search(name):
         try:
             model = ARIMA(series, order=param)
             results = model.fit()
-            print(f"ARIMA{param} - AIC:{results.aic}")
+            # print(f"ARIMA{param} - AIC:{results.aic}")
+            print(f"ARIMA{param} - AIC:{results.aic:.2f}")
             if results.aic < best_aic:
                 best_aic = results.aic
                 best_pdq = param
@@ -42,7 +43,7 @@ def ARIMA_parameter_search(name):
             continue
 
     print(f"Best ARIMA model:")
-    print(f"ARIMA{best_pdq} with AIC: {best_aic}")
+    print(f"ARIMA{best_pdq} with AIC: {best_aic:.2f}")
 
     # Save the best ARIMA model to disk
     best_model.save('best_arima_model.pkl')

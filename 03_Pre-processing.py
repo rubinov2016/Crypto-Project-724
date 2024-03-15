@@ -22,7 +22,7 @@ data_reduced = pca.fit_transform(data_standardized)
 # Step 4: Reattach the index column to the PCA-reduced data
 reduced_df = pd.DataFrame(data_reduced, index=index_col.index)
 reduced_df.insert(0, 'Index', index_col)
-
+print(reduced_df)
 # Apply K-means clustering to the reduced data
 kmeans = KMeans(n_clusters=4, random_state=42)
 clusters = kmeans.fit_predict(data_reduced)

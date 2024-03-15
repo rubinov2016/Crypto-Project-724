@@ -36,10 +36,8 @@ unavailable_tickers = []
 
 # Iterate over each ticker symbol
 for symbol in ticker_names:
-    # Retrieve data for the ticker symbol
     ticker = yf.Ticker(symbol)
-    ticker_data = ticker.history(period="1Y")  # Can adjust the period as needed
-    # Check if the ticker data is empty
+    ticker_data = ticker.history(period="max")
     if ticker_data.empty:
         unavailable_tickers.append(symbol)
         warnings.warn(f"Data not available for ticker symbol: {symbol}")

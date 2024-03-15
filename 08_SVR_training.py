@@ -126,7 +126,7 @@ if __name__ == "__main__":
     lag = 5
     future_steps = 30
     name = 'BTC-USD'
-    df = pd.read_csv('crypto_data_clean.csv')
+    df = pd.read_csv('crypto_data_clean2.csv')
     df = df[df['Symbol'] == name].drop(['Symbol'], axis=1).T
     df.index.name = 'Date'
     df.columns = ['Price']

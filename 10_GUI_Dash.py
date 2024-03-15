@@ -22,7 +22,8 @@ from datetime import timedelta
 import seaborn as sns
 import matplotlib.pyplot as plt
 # Load data
-df = pd.read_csv('crypto_data_clean.csv')
+# df = pd.read_csv('crypto_data_clean.csv')
+df = pd.read_csv('crypto_data_clean2.csv')
 df_stocks = df.copy()
 if df_stocks.index.name is None or df_stocks.index.name != df_stocks.columns[0]:
     df_stocks = df_stocks.set_index(df.columns[0])
@@ -33,10 +34,6 @@ df_reduced = df_reduced[['Index', 'Cluster']]
 
 df_reduced.rename(columns={'Index': 'Stock'}, inplace=True)
 df_reduced['Cluster'] = pd.to_numeric(df_reduced['Cluster'], errors='coerce')
-
-# # Load our data into a pandas DataFrame
-# df = pd.read_csv('crypto_data_reduced.csv')
-# df = df[['Index', 'Cluster']]
 
 # Initialize the Dash app
 app = dash.Dash(__name__)
@@ -56,6 +53,13 @@ def Model_chart(df1, df2, metrics, name):
                   xaxis={'title': 'Date'},
                   yaxis={'title': 'Value'},
                   hovermode='closest',
+                  legend=dict(
+                      orientation="h",
+                      x=0.5,
+                      y=1.1,
+                      xanchor='center',
+                      yanchor='bottom'
+                  ),
                   annotations=[
                       dict(
                           xref='paper', yref='paper',
@@ -145,7 +149,7 @@ def display_page(pathname):
         target_symbol = 'BTC-USD'  # Replace with our target stock symbol
 
         # Use the function to get top correlated stocks
-        top_positive, top_negative = get_top_correlated_stocks(target_symbol, df, n=10)
+        top_positive, top_negative = get_top_correlated_stocks(target_symbol, df, n=5)
         # Sort the negative correlations so the most negative come first
         top_negative = top_negative.sort_values()
 
@@ -179,7 +183,7 @@ def display_page(pathname):
             showscale=True
         )
 
-        fig_positive.update_layout(title='Top 10 Positive Correlations', xaxis={'title': 'Stock'},
+        fig_positive.update_layout(title='Top 5 Positive Correlations', xaxis={'title': ''},
                                    yaxis={'title': 'Correlation'})
         annotation_text_negative = [[f"{val:.2f}" for val in z_negative[0]]]  # Formatted text annotations
 
@@ -193,7 +197,7 @@ def display_page(pathname):
             showscale=True
         )
 
-        fig_negative.update_layout(title='Top 10 Negative Correlations', xaxis={'title': 'Stock'},
+        fig_negative.update_layout(title='Top 5 Negative Correlations', xaxis={'title': ''},
                                    yaxis={'title': 'Correlation'})
         # Return a Div containing the heatmap Graph for the EDA page
         return html.Div([
@@ -291,6 +295,7 @@ def display_page(pathname):
         df_SVR_historical = pd.read_json('SVR_historical.json', orient='index')
         df_SVR_forecasted = pd.read_json('SVR_forecast.json', orient='index')
         LSTM_metrics = pd.read_json('LSTM_metrics.json', typ='series')
+        # ARIMA_metrics = pd.DataFrame()
         ARIMA_metrics = pd.read_json('ARIMA_metrics.json', typ='series')
         SVR_metrics = pd.read_json('SVR_metrics.json', typ='series')
         Prophet_metrics = pd.read_json('Prophet_metrics.json', typ='series')

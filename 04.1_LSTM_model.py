@@ -111,14 +111,17 @@ if __name__ == "__main__":
     # Load the dataset (assuming df is our DataFrame as shown in the picture)
     # df = pd.read_csv('our_data.csv')
     name = 'BTC-USD'
-    df = pd.read_csv('crypto_data_clean.csv')
+    # df = pd.read_csv('crypto_data_clean.csv')
+    df = pd.read_csv('crypto_data_clean2.csv')
     df = df[df['Symbol'] == name].drop(['Symbol'], axis=1).T
     df.index.name = 'Date'
     df.columns = ['Price']
+    # !!
+    df = df.dropna()
     # Define the sequence length (the time window)
     sequence_length = 30
     epochs = 10
-    # LSTM_training(df, name, sequence_length, epochs)
+    LSTM_training(df, name, sequence_length, epochs)
     future_steps = 30
     keras_name = name+'_LTSM.keras'
     LSTM_forecasting(df, keras_name, future_steps)

@@ -55,9 +55,9 @@ def ARIMA_training(df, name):
 
     # Choose the ARIMA Model parameters (p, d, q)
     # These should be chosen based on model diagnostics like ACF, PACF plots or grid search
-    p = 2  # AR term
-    d = 1  # Differencing order
-    q = 1  # MA term
+    p = 1  # AR term
+    d = 2  # Differencing order
+    q = 2  # MA term
 
     model = ARIMA(df, order=(p, d, q))
     model_fit = model.fit()
@@ -129,7 +129,7 @@ def ARIMA_forecasting(name, future_steps=30, diff=0, last_value=0):
 
 if __name__ == "__main__":
     name = 'BTC-USD'
-    df = pd.read_csv('crypto_data_clean.csv')
+    df = pd.read_csv('crypto_data_clean2.csv')
     df = df[df['Symbol'] == name].drop(['Symbol'], axis=1).T
     df.index.name = 'Date'
     df.columns = ['Price']
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     df2 = df
     diff = 0
     last_value = 0
-    df2, diff, last_value = ARIMA_check(df)
+    # df2, diff, last_value = ARIMA_check(df)
     print(137, last_value)
     df.to_json('ARIMA_historical.json', orient='index')
     summary = ARIMA_training(df2, name)

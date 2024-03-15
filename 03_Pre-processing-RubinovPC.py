@@ -25,13 +25,13 @@ reduced_df.insert(0, 'Index', index_col)
 # Print explained variance ratio for each component
 print("Explained variance ratio by component:")
 for i, variance in enumerate(pca.explained_variance_ratio_):
-    print(f"PC{i+1}: {variance:.4f}")
+    print(f"PC-{i+1}: {variance:.4f}")
 
 # Print cumulative explained variance
 cumulative_variance = pca.explained_variance_ratio_.cumsum()
 print("\nCumulative explained variance:")
 for i, cum_variance in enumerate(cumulative_variance):
-    print(f"PC1 to PC{i+1}: {cum_variance:.4f}")
+    print(f"PC-1 to PC-{i+1}: {cum_variance:.4f}")
 
 plt.figure(figsize=(10, 7))
 plt.plot(range(1, n_components + 1), cumulative_variance, marker='o', linestyle='--')

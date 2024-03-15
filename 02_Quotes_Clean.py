@@ -1,11 +1,10 @@
 import pandas as pd
 
 df = pd.read_csv('crypto_data.csv')
-
 # Pivot the DataFrame
 df = df.pivot(index='Symbol', columns='Date', values='Close')
-df = df.dropna()
-df.to_csv('crypto_data_clean.csv', header=True)
+# df = df.dropna()
+df.to_csv('crypto_data_clean2.csv', header=True)
 
 #
 # new_column_names = df.iloc[0]
