@@ -141,9 +141,11 @@ def average_price_for_brand(df, brand_name, feature1, feature2):
 def average_weight_by_manufacturer(df, feature1, feature2):
     # Group the DataFrame by 'manufacturer'
     grouped_by_manufacturer = df.groupby(feature1)
+    print(44, grouped_by_manufacturer)
 
     # Select the 'weight_gram' column from the grouped DataFrame
     weight_column = grouped_by_manufacturer[feature2]
+    print(55, weight_column)
 
     # Calculate the mean of the 'weight_gram' column
     avg_weight_by_manufacturer = weight_column.mean().round(2)
@@ -190,8 +192,10 @@ if __name__ == "__main__":
             Date_Added_Column_ID = header.index('info_added_date')
 
         choice = 0
+
         while choice != 13:
             menu_function()
+
             choice = int(input())
             if choice == 1:
                 oem_input = input("Enter oem_id: ")
